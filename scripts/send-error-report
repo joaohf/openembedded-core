@@ -42,27 +42,35 @@ def handle_connection(server, data):
     return conn
 
 
-def sendData(json_file, server):
+def sendData(json_file, server, username = '', email = ''):
 
     if os.path.isfile(json_file):
 
-        home = os.path.expanduser("~")
-        userfile = os.path.join(home, ".oe-send-error")
-        if os.path.isfile(userfile):
-            with open(userfile) as g:
-                username = g.readline()
-                email = g.readline()
-        else:
-            print("Please enter your name and your email (optionally), they'll be saved in the file you send.")
-            username = raw_input("Name: ")
-            email = raw_input("E-mail (not required): ")
-            if len(username) > 0 and len(username) < 50:
-                with open(userfile, "w") as g:
-                    g.write(username + "\n")
-                    g.write(email + "\n")
-            else:
-                print("Invalid inputs, try again.")
+        if username:
+            if len(username) > 0 and len(username) > 50:
+                print("Invalid username input, try again.")
                 return
+            if len(email) > 0 and len(email) > 50:
+                print("Invalid username input, try again.")
+                return
+        else:
+            home = os.path.expanduser("~")
+            userfile = os.path.join(home, ".oe-send-error")
+            if os.path.isfile(userfile):
+                with open(userfile) as g:
+                    username = g.readline()
+                    email = g.readline()
+            else:
+                print("Please enter your name and your email (optionally), they'll be saved in the file you send.")
+                username = raw_input("Name: ")
+                email = raw_input("E-mail (not required): ")
+                if len(username) > 0 and len(username) < 50:
+                    with open(userfile, "w") as g:
+                        g.write(username + "\n")
+                        g.write(email + "\n")
+                else:
+                    print("Invalid inputs, try again.")
+                    return
 
         with open(json_file) as f:
             data = f.read()
@@ -103,8 +111,11 @@ if __name__ == '__main__':
         print("\nUsage: send-error-report <error_fileName> [server]")
         print("\nIf this is the first when sending a report you'll be asked for your name and optionally your email address.")
         print("They will be associated with your report.\n")
-
     elif len(sys.argv) == 3:
         sendData(sys.argv[1], sys.argv[2])
+    elif len(sys.argv) == 4:
+        sendData(sys.argv[1], sys.argv[2], sys.argv[3])
+    elif len(sys.argv) == 5:
+        sendData(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
     else:
         sendData(sys.argv[1], "errors.yoctoproject.org")

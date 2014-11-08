@@ -8,6 +8,8 @@
 
 ERR_REPORT_DIR ?= "${LOG_DIR}/error-report"
 ERR_REPORT_SERVER ?= ""
+ERR_REPORT_USER ?= ""
+ERR_REPORT_EMAIL ?= ""
 
 def errorreport_getdata(e):
     logpath = e.data.getVar('ERR_REPORT_DIR', True)
@@ -29,7 +31,9 @@ def errorreport_senddata(e, datafile):
     import subprocess
     server = e.data.getVar('ERR_REPORT_SERVER', True)
     if server:
-        cmd = 'send-error-report %s %s' % (datafile, server)
+        user = e.data.getVar('ERR_REPORT_USER', True)
+        email = e.data.getVar('ERR_REPORT_EMAIL', True)
+        cmd = 'send-error-report %s %s %s %s' % (datafile, server, user, email)
         subprocess.call(cmd, shell=True)
     else:
         bb.note("The errors for this build are stored in %s\nYou can send the errors to an upstream server by running:\n  send-error-report %s [server]" % (datafile, datafile))
