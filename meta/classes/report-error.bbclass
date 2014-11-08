@@ -7,6 +7,7 @@
 # Licensed under the MIT license, see COPYING.MIT for details
 
 ERR_REPORT_DIR ?= "${LOG_DIR}/error-report"
+ERR_REPORT_SERVER ?= ""
 
 def errorreport_getdata(e):
     logpath = e.data.getVar('ERR_REPORT_DIR', True)
@@ -24,6 +25,16 @@ def errorreport_savedata(e, newdata, file):
         json.dump(newdata, f, indent=4, sort_keys=True)
     return datafile
 
+def errorreport_senddata(e, datafile):
+    import subprocess
+    server = e.data.getVar('ERR_REPORT_SERVER', True)
+    if server:
+        cmd = 'send-error-report %s %s' % (datafile, server)
+        subprocess.call(cmd, shell=True)
+    else:
+        bb.note("The errors for this build are stored in %s\nYou can send the errors to an upstream server by running:\n  send-error-report %s [server]" % (datafile, datafile))
+        bb.note("The contents of these logs will be posted in public if you use the above command with the default server. If you need to do so, please ensure you remove any identifying or proprietary information before sending.")
+    
 python errorreport_handler () {
         import json
 
